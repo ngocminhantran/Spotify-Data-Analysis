@@ -75,6 +75,20 @@ HAVING COUNT(id) > 1;
 
 
 
+-- Find the most popular tracks
+SELECT TOP 10 * 
+FROM Spotify_Project.dbo.tracks_modified
+ORDER BY popularity DESC;
+
+
+
+-- Find the least popular tracks
+SELECT TOP 10 * 
+FROM Spotify_Project.dbo.tracks_modified
+ORDER BY popularity ASC;
+
+
+
 -- Find correlation between popularity and track variables
 SELECT
     'popularity' AS var1,
@@ -163,20 +177,6 @@ SELECT
         /(SQRT(SUM(SQUARE(popularity))-SQUARE(SUM(popularity))/COUNT(*))*SQRT(SUM(SQUARE(time_signature))-SQUARE(SUM(time_signature))/COUNT(*)))) AS coeff
 FROM Spotify_Project.dbo.tracks_modified
 WHERE time_signature IS NOT NULL;
-
-
-
--- Find the most popular tracks
-SELECT TOP 10 * 
-FROM Spotify_Project.dbo.tracks_modified
-ORDER BY popularity DESC;
-
-
-
--- Find the least popular songs
-SELECT TOP 10 * 
-FROM Spotify_Project.dbo.tracks_modified
-ORDER BY popularity ASC;
 
 
 
@@ -289,26 +289,6 @@ WHERE id in (
     )
 ORDER BY popularity DESC;
 
-
-
--- Find artists who appear in the highest number of tracks
-WITH artists AS (
-    SELECT value as individual_artist
-    FROM Spotify_Project.dbo.tracks_modified 
-    CROSS APPLY STRING_SPLIT(id_artists, ',')
-    ),
-    artist_count AS (
-        SELECT TOP 5 TRIM(individual_artist) AS id_artist, COUNT(individual_artist) AS count 
-        FROM artists
-        GROUP BY individual_artist 
-        ORDER BY count DESC
-    )
-SELECT c.id_artist, c.count,
-    (SELECT artists
-    FROM Spotify_Project.dbo.tracks_modified AS t
-    WHERE t.id_artists = c.id_artist
-    GROUP BY artists) AS artists
-FROM artist_count as c;
 
 
 -- Find the genre having the largest number of artists
